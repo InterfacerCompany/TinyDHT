@@ -19,6 +19,10 @@
 
 #include "TinyDHT.h"
 
+DHT::DHT() {
+  firstreading = true;
+}
+
 DHT::DHT(uint8_t pin, uint8_t type, uint8_t count) {
   _pin = pin;
   _type = type;
@@ -27,6 +31,16 @@ DHT::DHT(uint8_t pin, uint8_t type, uint8_t count) {
 }
 
 void DHT::begin(void) {
+  // set up the pins!
+  pinMode(_pin, INPUT);
+  digitalWrite(_pin, HIGH);
+  _lastreadtime = 0;
+}
+
+void DHT::begin(uint8_t pin, uint8_t type, uint8_t count) {
+  _pin = pin;
+  _type = type;
+  _count = count;
   // set up the pins!
   pinMode(_pin, INPUT);
   digitalWrite(_pin, HIGH);

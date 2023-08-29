@@ -48,11 +48,13 @@ public:
    * @param count Used to set how much data to take at a time. Very few reasons
    * to change this
    */
+  DHT();
   DHT(uint8_t pin, uint8_t type, uint8_t count = 6);
   /*!
    * @brief Begins connection with device
    */
   void begin(void);
+  void begin(uint8_t pin, uint8_t type, uint8_t count = 6);
   /*!
    * @brief Reads the temperature from device
    * @param S Scale. True = Fahrenheit, False = Celcius
