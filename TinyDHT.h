@@ -35,42 +35,60 @@ written by Adafruit Industries
 class DHT {
 private:
   uint8_t data[6];
-  uint8_t _pin, _type, _count;
-  boolean read(void);
-  unsigned long _lastreadtime;
-  boolean firstreading;
+  uint8_t _pin, _type;
+#ifdef __AVR
+  // Use direct GPIO access on an 8-bit AVR so keep track of the port and
+  // bitmask for the digital pin connected to the DHT.  Other platforms will use
+  // digitalRead.
+  uint8_t _bit, _port;
+#endif
+  unsigned long _lastreadtime, _maxcycles;
+  bool firstreading;
+
+  bool read(void);
+  uint32_t expectPulse(bool level);
 
 public:
   /*!
    * @brief DHT constructor
-   * @param pin Pin connected to the DHT
-   * @param type What sensor you're connecting, DHT11, DHT22, DHT21, AM2301
-   * @param count Used to set how much data to take at a time. Very few reasons
-   * to change this
    */
   DHT();
-  DHT(uint8_t pin, uint8_t type, uint8_t count = 6);
+
   /*!
    * @brief Begins connection with device
+   * @param pin Pin connected to the DHT
+   * @param type What sensor you're connecting, DHT11, DHT22, DHT21, AM2301
    */
-  void begin(void);
-  void begin(uint8_t pin, uint8_t type, uint8_t count = 6);
+  void begin(uint8_t pin, uint8_t type);
+
   /*!
    * @brief Reads the temperature from device
-   * @param S Scale. True = Fahrenheit, False = Celcius
    * @return Returns the temperature
    */
-  int16_t readTemperature(bool S = false);
-  /*!
-   * @brief Converts Celcius to Fahrenheit
-   * @param c Degrees celcius
-   * @return Returns the inputted degrees converted to Fahrenheit
-   */
-  int16_t convertCtoF(int16_t);
+  int16_t readTemperature(void);
+
   /*!
    * @brief Reads the humidity from the device
    * @return Returns the humidity read from the device
    */
   uint8_t readHumidity(void);
 };
+
+/*!
+ *  @brief  Class that defines Interrupt Lock Avaiability
+ */
+class InterruptLock {
+public:
+  InterruptLock() {
+#if !defined(ARDUINO_ARCH_NRF52)
+    noInterrupts();
+#endif
+  }
+  ~InterruptLock() {
+#if !defined(ARDUINO_ARCH_NRF52)
+    interrupts();
+#endif
+  }
+};
+
 #endif
